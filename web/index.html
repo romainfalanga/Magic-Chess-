@@ -12,57 +12,11 @@
   <link rel="icon" type="image/png" href="favicon.png"/>
   <title>Magic Chess</title>
   <link rel="manifest" href="manifest.json">
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
   <style>
-    body {
-      background-color: #0D0A1A;
-      margin: 0;
-      padding: 0;
-    }
-    #loading {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: #0D0A1A;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
-    #loading span {
-      font-size: 56px;
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-    #loading p {
-      color: #7B2FBE;
-      font-family: sans-serif;
-      font-size: 14px;
-      margin-top: 16px;
-      letter-spacing: 2px;
-    }
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.15); opacity: 0.7; }
-    }
+    body { background-color: #0D0A1A; margin: 0; padding: 0; }
   </style>
 </head>
 <body>
-  <div id="loading">
-    <span>♟</span>
-    <p>MAGIC CHESS</p>
-  </div>
-  <script>
-    window.addEventListener('flutter-first-frame', function() {
-      var loading = document.getElementById('loading');
-      if (loading) loading.style.display = 'none';
-    });
-  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
