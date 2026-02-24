@@ -1,7 +1,30 @@
 [build]
   publish = "build/web"
-  command = "echo 'Using pre-built Flutter web app'"
+  command = ""
 
+# Headers pour tous les fichiers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+
+# Headers critiques pour les fichiers WASM (CanvasKit Flutter)
+[[headers]]
+  for = "/*.wasm"
+  [headers.values]
+    Content-Type = "application/wasm"
+    Cross-Origin-Embedder-Policy = "require-corp"
+    Cross-Origin-Opener-Policy = "same-origin"
+
+[[headers]]
+  for = "/canvaskit/*"
+  [headers.values]
+    Cross-Origin-Embedder-Policy = "require-corp"
+    Cross-Origin-Opener-Policy = "same-origin"
+    Access-Control-Allow-Origin = "*"
+
+# Redirection SPA Flutter
 [[redirects]]
   from = "/*"
   to = "/index.html"
