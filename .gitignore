@@ -5,7 +5,12 @@
 .packages
 .pub-cache/
 .pub/
-build/
+# On garde build/web pour Netlify
+build/android/
+build/ios/
+build/linux/
+build/macos/
+build/windows/
 *.iml
 
 # Android
