@@ -4,9 +4,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/game_provider.dart';
+import '../services/auth_service.dart';
 import '../utils/fantasy_theme.dart';
 import 'game_screen.dart';
+import 'social_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -18,9 +22,7 @@ class HomeScreen extends StatelessWidget {
       body: SafeArea(
         child: Stack(
           children: [
-            // Fond
             _buildBackground(context),
-            // Contenu
             _buildContent(context),
           ],
         ),
@@ -74,32 +76,130 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildContent(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         children: [
-          const SizedBox(height: 40),
-
+          const SizedBox(height: 16),
+          // Barre profil utilisateur
+          _buildProfileBar(context, user),
+          const SizedBox(height: 20),
           // Logo / Titre
           _buildTitle(),
-
-          const SizedBox(height: 30),
-
+          const SizedBox(height: 20),
           // Mini échiquier décoratif
           _buildDecorativeBoard(),
-
-          const SizedBox(height: 30),
-
+          const SizedBox(height: 20),
           // Description du mode de jeu
           _buildModeDescription(),
-
           const Spacer(),
-
-          // Bouton jouer
+          // Boutons
+          _buildOnlineButton(context),
+          const SizedBox(height: 12),
           _buildPlayButton(context),
-
-          const SizedBox(height: 40),
+          const SizedBox(height: 30),
         ],
+      ),
+    );
+  }
+
+  Widget _buildProfileBar(BuildContext context, User? user) {
+    return StreamBuilder<DocumentSnapshot>(
+      stream: user != null
+          ? FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots()
+          : null,
+      builder: (context, snapshot) {
+        final data = snapshot.data?.data() as Map<String, dynamic>?;
+        final username = data?['username'] ?? 'Joueur';
+        final avatar = data?['avatar'] ?? '♙';
+        final wins = data?['wins'] ?? 0;
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: FantasyTheme.cardDecoration(
+            borderColor: FantasyTheme.gold.withValues(alpha: 0.3),
+            borderRadius: 20,
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: FantasyTheme.purpleGradient,
+                ),
+                child: Center(child: Text(avatar, style: const TextStyle(fontSize: 20))),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(username,
+                        style: TextStyle(
+                            color: FantasyTheme.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14)),
+                    Text('$wins victoires',
+                        style: TextStyle(
+                            color: FantasyTheme.silver, fontSize: 11)),
+                  ],
+                ),
+              ),
+              // Bouton amis
+              IconButton(
+                onPressed: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const SocialScreen())),
+                icon: Icon(Icons.people_outline,
+                    color: FantasyTheme.purpleLight, size: 24),
+                tooltip: 'Amis',
+              ),
+              // Déconnexion
+              IconButton(
+                onPressed: () => AuthService.signOut(),
+                icon: Icon(Icons.logout,
+                    color: FantasyTheme.silver.withValues(alpha: 0.6),
+                    size: 20),
+                tooltip: 'Se déconnecter',
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildOnlineButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+          context, MaterialPageRoute(builder: (_) => const SocialScreen())),
+      child: Container(
+        width: double.infinity,
+        height: 52,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(26),
+          border: Border.all(color: FantasyTheme.emerald.withValues(alpha: 0.6)),
+          color: FantasyTheme.emerald.withValues(alpha: 0.1),
+          boxShadow: FantasyTheme.glowShadow(FantasyTheme.emerald, intensity: 0.2),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('🌐', style: TextStyle(fontSize: 20)),
+            const SizedBox(width: 10),
+            Text(
+              'JOUER EN LIGNE',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: FantasyTheme.emerald,
+                letterSpacing: 1.5,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
